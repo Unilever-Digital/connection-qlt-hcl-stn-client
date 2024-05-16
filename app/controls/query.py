@@ -3,7 +3,19 @@ import time
 from datetime import datetime as dt
 from app.controls.control import *
 
-def optimizationQueryCheckweigher(table):
+
+""" 
+Table_Data
+Table_ImageFail_Barcode
+Table_ImageFail_Cap1
+Table_ImageFail_Cap2
+Table_ImageFail_DateCode
+Table_ImageFail_LO1
+Table_ImageFail_LO2
+Table_Product
+"""
+
+def optimizationQueryData(table):
     """
     counter bottles server
     """
@@ -61,7 +73,7 @@ def optimizationQueryCheckweigher(table):
     collection.insert_many(data_insert)
     connection.close()
 
-def optimizationQueryImageFail(table):
+def optimizationQueryImageFailBarcode(table):
     """
     counter bottles server
     """
@@ -119,7 +131,7 @@ def optimizationQueryImageFail(table):
     collection.insert_many(data_insert)
     connection.close()
 
-def optimizationQueryOperating(table):
+def optimizationQueryImageFailCap1(table):
     """
     counter bottles server
     """
@@ -181,7 +193,7 @@ def optimizationQueryOperating(table):
     collection.insert_many(data_insert)
     connection.close()
 
-def optimizationQueryProduct(table):
+def optimizationQueryImageFailCap2(table):
     """
     counter bottles server
     """
@@ -238,7 +250,7 @@ def optimizationQueryProduct(table):
     collection.insert_many(data_insert)
     connection.close()
 
-def optimizationQueryResultCarton(table):
+def optimizationQueryImageFailDateCode(table):
     """
     result carton
     """
@@ -292,7 +304,7 @@ def optimizationQueryResultCarton(table):
     collection.insert_many(data_insert)
     connection.close()
 
-def optimizationQueryResultDataman(table):
+def optimizationQueryImageFailLO1(table):
     """
     result dataman
     """
@@ -346,6 +358,60 @@ def optimizationQueryResultDataman(table):
     collection.insert_many(data_insert)
     connection.close()
     
+def optimizationQueryImageFailLO2(table):
+    """
+    result dataman
+    """
+    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    cursor = connection.cursor()
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+
+    result = collection.delete_many({})
+    startdate = datetime.datetime(2023, 1, 1, 0, 0, 0)
+    query = f"""
+    SELECT CONVERT(date, DateTime) AS date,
+        DAY(DateTime) AS day,
+        MONTH(DateTime) AS month,
+        YEAR(DateTime) AS year,
+        Shift AS shift,
+		FGsCode AS sku,
+        ProductName AS productName,
+		Line As line,
+        COUNT(*) AS count,
+        SUM(CASE WHEN Status = 'Good' THEN 1 ELSE 0 END) AS countGood,
+        SUM(CASE WHEN Status = 'Not Good' THEN 1 ELSE 0 END) AS countNotgood
+    FROM {table}
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode,
+        CASE
+            WHEN DATEPART(hh, DateTime) < 6 THEN 1
+            WHEN DATEPART(hh, DateTime) < 14 THEN 2
+            ELSE 3
+        END
+    ORDER BY date, shift;
+    """
+    cursor.execute(query)
+    data = cursor.fetchall()
+    data_insert = []
+    for row in data:
+        new_row = {
+            "date": row[0],
+            "day": row[1],
+            "month": row[2],
+            "year": row[3],
+            "shift": row[4],
+            "sku":  row[5],
+            "name": row[6].
+            "line": row[7],
+            "count": row[8],
+            "countPass": row[9],
+            "countNotgood": row[10],
+        }
+        data_insert.append(new_row)
+    print(data_insert)
+
+    collection.insert_many(data_insert)
+    connection.close()
+
 def querySqlServer():
     optimizationQueryCheckweigher("Table_Checkweigher") ## done
     optimizationQueryImageFail("Table_ImageFail") ## done
