@@ -1,0 +1,291 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #322b71;
+}
+
+.header {
+    position: fixed;
+    background-color: #d4ddff;
+    text-align: center;
+    z-index: 1;
+    height: 40px;
+    width: 100%;
+    top: 0;
+}
+
+.header p {
+    margin-left: 10px;
+}
+
+.workspace {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    width: 100%;
+    margin-top: 10px;
+    margin-left: 5px;
+}
+
+.sidebar {
+    background-color: #f4f4f4;
+    width: 250px;
+    height: 100vh;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+.footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section h2 {
+    margin-top: 0;
+}
+
+.column {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+nav {
+    height: 35px;
+    margin-top: 40px;
+    background-color: #dbe1f9;
+    text-align: justify;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 5px;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 10px;
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+nav ul li a {
+    color: #000000;
+    text-decoration: none;
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+main {
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+form input[type="text"],
+form input[type="password"],
+form select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+form input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.database-view {
+    position: absolute;
+    background-color: #ffffff;
+    height: 100%;
+    width: 25%;
+    margin-right: 20px;
+    overflow: y;
+}
+
+.database-view-header {
+    position: absolute;
+    background-color: #ffde8b;
+    margin-top: 0px;
+    height: 30px;
+    font-weight: 500;
+    width: 100%;
+}
+
+.database-view-header p {
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.editor-space {
+    position: absolute;
+    background-color: #ffffff;
+    height: 100%;
+    width: 55%;
+    margin-left: calc(25% + 10px);
+}
+
+.prototype-column {
+    position: absolute;
+    background-color: #ffffff;
+    height: 100%;
+    width: 18%;
+    right: 10px;
+    left: calc(80% + 20px);
+    ;
+}
+
+.prototype-column-header {
+    position: absolute;
+    background-color: #dfdfdf;
+    margin-top: 0px;
+    height: 30px;
+    font-weight: 500;
+    width: 100%;
+}
+
+.prototype-column-header p {
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.treeview {
+    margin-top: 40px;
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+
+/* Style for tree view items */
+
+.treeview li {
+    cursor: pointer;
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+
+/* Style for tree view items on hover */
+
+.treeview li:hover {
+    color: blue;
+}
+
+.run-button {
+    background-color: #45a049;
+    border: none;
+    color: white;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.run-button:hover {
+    background-color: #00b32d;
+    /* Darker blue color */
+}
+
+.run-button:active {
+    background-color: #00b32d;
+    border-width: 3px;
+    border-color: #dc3545;
+    /* Darker blue color */
+}
+
+.fa-play {
+    margin-right: 5px;
+    /* Adjust spacing between icon and text */
+}
+
+.stop-button {
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #1f55df;
+    /* Change as needed */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.stop-button:active {
+    background-color: #dc3545;
+}
+
+.stop-button:hover {
+    background-color: #dc3545;
+}
+
+.stop-button i {
+    margin-right: 5px;
+}
+
+.status-bar {
+    position: absolute;
+    border-radius: 2;
+    border-width: 1px;
+    border-color: black;
+    width: 50px;
+    height: 5px;
+    visibility: visible;
+}
+
+.start-color {
+    background-color: #00b32d;
+}
+
+.end-color {
+    background-color: #f20742;
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSSQL API Management App</title>
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <script src="static/js/index.js"></script>
+    <header class="header">
+        <p>MSSQL API Management App</p>
+    </header>
+    <nav>
+        <form action="/home" method="post">
+            <ul>
+                <li><a href="#">File</a></li>
+                <li><a href="#">Edit</a></li>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Tables</a></li>
+                <li><a href="#">Queries</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><button class="run-button" type="submit" onclick="eventClickStart()" name ="button" value = "start"><i class="fas fa-play"></i> Run</button></li>
+                <li><button class="stop-button" type="submit" onclick="eventClickEnd()" name ="button" value = "end"><i class="fas fa-stop"></i> Stop</button></li>
+                <li><div class="status-bar"></div></li>
+            </ul>
+        </form>
+    </nav>
+    <div class="workspace">
+        <div class="database-view">
+            <div class="database-view-header">
+                <p>Object Explorer</p>
+            </div>
+            <div class="database-view-body">
+                <ul class="treeview">
+                    <li onclick="handleItemClick('cap_quality')"><i class="fas fa-database"></i> cap quality</li>
+                    <li onclick="handleItemClick('couter_bottles_quality')"><i class="fas fa-database"></i> couter-bottles quality</li>
+                    <li onclick="handleItemClick('carton_quality')"><i class="fas fa-database"></i> carton quality</li>
+                </ul>
+            </div>
+        </div>
+        <div class="editor-space">
+            <!-- SQL query editor goes here -->
+        </div>
+        <div class="prototype-column">
+            <div class="prototype-column-header">
+                <p>Prototype</p>
+            </div>
+            <div class="prototype-column-body">
+                <!-- Prototype column content goes here -->
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2024 Unilever</p>
+    </footer>
+    <script src="static/js/index.js"></script>
+    <script> 
+        document.addEventListener("DOMContentLoaded", function() {
+        const startButton = document.querySelector(".run-button");
+        const endButton = document.querySelector(".stop-button");
+        const statusBar = document.querySelector(".status-bar");
+
+        startButton.addEventListener("click", function() {
+            statusBar.classList.remove("end-color");
+            statusBar.classList.add("start-color");
+        });
+
+        endButton.addEventListener("click", function() {
+            statusBar.classList.remove("start-color");
+            statusBar.classList.add("end-color");
+        });
+        });
+    </script>
+
+</body>
+</html>

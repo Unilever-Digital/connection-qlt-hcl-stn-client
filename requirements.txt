@@ -1,0 +1,7 @@
+pymssql
+pandas
+numpy
+pyodbc
+openpyxl
+pymongo
+schedule
