@@ -19,9 +19,9 @@ def optimizationQueryData(table):
     """
     counter bottles server
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2",table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn",table)
     
     result = collection.delete_many({})
     startdate = datetime.datetime(2023, 1, 1, 0, 0, 0)
@@ -77,9 +77,9 @@ def optimizationQueryImageFailBarcode(table):
     """
     counter bottles server
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn", table)
     
     result = collection.delete_many({})
     
@@ -96,12 +96,11 @@ def optimizationQueryImageFailBarcode(table):
         END AS shift,
 		FGsCode AS sku,
 		Line As line,
-        BarcodeTarget AS target,
-        BarcodeCurrent AS current,
+        Target AS target,
         COUNT(*) AS count,
-        COUNT(ImageFail) AS countImageFail
+        COUNT(ImageFail) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, BarcodeTarget, BarcodeCurrent
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Target
             CASE
                 WHEN DATEPART(hh, DateTime) < 6 THEN 1
                 WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -122,9 +121,7 @@ def optimizationQueryImageFailBarcode(table):
             "sku":  row[5],
             "line": row[6],
             "target": row[7],
-            "current": row[8],
-            "count": row[9],
-            "countImageFail": row[10],
+            "countFail": row[8],
         }
         data_insert.append(new_row)
 
@@ -135,9 +132,9 @@ def optimizationQueryImageFailCap1(table):
     """
     counter bottles server
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn", table)
 
     result = collection.delete_many({})
     print(result)
@@ -197,9 +194,9 @@ def optimizationQueryImageFailCap2(table):
     """
     counter bottles server
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn", table)
     
     result = collection.delete_many({})
     print(result)
@@ -217,11 +214,16 @@ def optimizationQueryImageFailCap2(table):
             ELSE 3
         END AS shift,
         FGsCode AS sku,
+        Camera AS camera,
         COUNT(*) AS count,
-        SUM(CASE WHEN Status = 'Good' THEN 1 ELSE 0 END) AS countPass,
-        SUM(CASE WHEN Status = 'NotGood' THEN 1 ELSE 0 END) AS countReject
+        COUNT(ImageFail) AS countFail
     FROM {table}
-    GROUP BY SKUID
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Camera
+        CASE
+            WHEN DATEPART(hh, DateTime) < 6 THEN 1
+            WHEN DATEPART(hh, DateTime) < 14 THEN 2
+            ELSE 3
+        END
     ORDER BY date, shift;
     """
     cursor.execute(pipeline)
@@ -236,9 +238,9 @@ def optimizationQueryImageFailCap2(table):
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "count": row[6],
-            "countGood": row[7],
-            "countNotGood": row[8],
+            "camera": row[6],
+            "count": row[7],
+            "countFail": row[8],
         }
         #for key, value in new_row.items():
             #if key == "date":
@@ -254,9 +256,9 @@ def optimizationQueryImageFailDateCode(table):
     """
     result carton
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn", table)
     
     result = collection.delete_many({})
     startdate = datetime.datetime(2023, 1, 1, 0, 0, 0)
@@ -266,14 +268,12 @@ def optimizationQueryImageFailDateCode(table):
         MONTH(DateTime) AS month,
         YEAR(DateTime) AS year,
         Shift AS shift,
-		FgsCode AS sku,
-        ProductName AS productName,
+		FGsCode AS sku,
 		Line As line,
         COUNT(*) AS count,
-        SUM(CASE WHEN Status = 'Good' THEN 1 ELSE 0 END) AS countGood,
-        SUM(CASE WHEN Status = 'Not Good' THEN 1 ELSE 0 END) AS countNotgood
+        COUNT(ImageFail) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, ProductName
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode
         CASE
             WHEN DATEPART(hh, DateTime) < 6 THEN 1
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -308,9 +308,9 @@ def optimizationQueryImageFailLO1(table):
     """
     result dataman
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn", table)
     
     result = collection.delete_many({})
     startdate = datetime.datetime(2023, 1, 1, 0, 0, 0)
@@ -362,9 +362,9 @@ def optimizationQueryImageFailLO2(table):
     """
     result dataman
     """
-    connection = connectToSqlServer('DESKTOP-M7H8BIL', 'U-CheckDate-Barcode')
+    connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
-    collection = ensure_collection_exists("U-CheckDate-Barcode-Po2", table)
+    collection = ensure_collection_exists("U-CheckDate-Barcode-Stn", table)
 
     result = collection.delete_many({})
     startdate = datetime.datetime(2023, 1, 1, 0, 0, 0)
@@ -414,9 +414,9 @@ def optimizationQueryImageFailLO2(table):
 
 def querySqlServer():
     optimizationQueryData("Table_Data") ## done
-    optimizationQueryImageFailBarcode("Table_ImageFailBarcode") ## done
-    optimizationQueryImageFailCap1("Table_ImageFailCap1")
-    optimizationQueryImageFailCap2("Table_ImageFailCap2")
-    optimizationQueryImageFailDateCode("Table_ImageFailDateCode")
-    optimizationQueryImageFailLO1("Table_ImageFailLO1") 
-    optimizationQueryImageFailLO2("Table_ImageFailLO2")
+    optimizationQueryImageFailBarcode("Table_ImageFail_Barcode") ## done
+    optimizationQueryImageFailCap1("Table_ImageFail_Cap1")
+    optimizationQueryImageFailCap2("Table_ImageFail_Cap2")
+    optimizationQueryImageFailDateCode("Table_ImageFail_DateCode")
+    optimizationQueryImageFailLO1("Table_ImageFail_LO1") 
+    optimizationQueryImageFailLO2("Table_ImageFail_LO2")
