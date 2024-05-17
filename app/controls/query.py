@@ -413,9 +413,10 @@ def optimizationQueryImageFailLO2(table):
     connection.close()
 
 def querySqlServer():
-    optimizationQueryCheckweigher("Table_Checkweigher") ## done
-    optimizationQueryImageFail("Table_ImageFail") ## done
-    #optimizationQueryOperating("Table_Operating")
-    #optimizationQueryProduct("Table_Product")
-    optimizationQueryResultCarton("Table_ResultCarton") ## done
-    optimizationQueryResultDataman("Table_ResultDataman")
+    optimizationQueryData("Table_Data") ## done
+    optimizationQueryImageFailBarcode("Table_ImageFailBarcode") ## done
+    optimizationQueryImageFailCap1("Table_ImageFailCap1")
+    optimizationQueryImageFailCap2("Table_ImageFailCap2")
+    optimizationQueryImageFailDateCode("Table_ImageFailDateCode")
+    optimizationQueryImageFailLO1("Table_ImageFailLO1") 
+    optimizationQueryImageFailLO2("Table_ImageFailLO2")
