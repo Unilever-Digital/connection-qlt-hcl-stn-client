@@ -17,7 +17,7 @@ Table_Product
 
 def optimizationQueryData(table):
     """
-    counter bottles server
+    table data 
     """
     connection = connectToSqlServer('DESKTOP-DGEHS9H', 'U-CheckDate-Barcode')
     cursor = connection.cursor()
@@ -33,9 +33,6 @@ def optimizationQueryData(table):
         Shift AS shift,
 		FGsCode AS sku,
 		Line As line,
-        Weight_Under AS under,
-        Weight_Target AS target,
-        Weight_Over AS over,
         COUNT(*) AS count,
         SUM(CASE WHEN Status = 'Good' THEN 1 ELSE 0 END) AS countGood,
         SUM(CASE WHEN Status = 'Not Good' THEN 1 ELSE 0 END) AS countNotgood
@@ -60,15 +57,11 @@ def optimizationQueryData(table):
             "shift": row[4],
             "sku":  row[5],
             "line": row[6],
-            "under": row[7],
-            "target": row[8],
-            "over": row[9],
-            "count": row[10],
+            "count": row[7],
             "countPass": row[11],
             "countNotgood": row[12],
         }
         data_insert.append(new_row)
-    print(data_insert)
 
     collection.insert_many(data_insert)
     connection.close()
