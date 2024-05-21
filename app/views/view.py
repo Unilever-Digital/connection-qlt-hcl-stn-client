@@ -30,5 +30,5 @@ def homeViewQT():
     root.protocol("WM_DESTROY", stop_task)
     root.mainloop()
 
-# pyinstaller --onefile --hidden-import schedule --hidden-import pyodbc --hidden-import openpyxl --hidden-import pymongo --hidden-import threading --hidden-import pymssql --hidden-import datetime main.py
+# pyinstaller --onefile --hidden-import schedule --hidden-import pyodbc --hidden-import openpyxl --hidden-import pymongo --hidden-import threading --hidden-import pymssql --hidden-import datetime --hidden-import pillow main.py
 
