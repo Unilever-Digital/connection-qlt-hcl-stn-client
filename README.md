@@ -17,7 +17,7 @@ Local app for streamming data to PBI
   - pyinstaller --onefile main.py
 
 ### Contributing
-If you would like to contribute to this project, please fork the repository and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
+Unilever digital team
 
 ### License
 This project is licensed under the MIT License. See the LICENSE file for details.
