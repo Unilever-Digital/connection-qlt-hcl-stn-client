@@ -10,10 +10,10 @@ def run_task_schedule():
         try:
             querySqlServer()
             print("loop")
-            time.sleep(4)  # Sleep for 4 second
+            time.sleep(120)  # Sleep for 4 second
         except Exception as e:
             print(e)
-            time.sleep(4)
+            time.sleep(10)
             
 # Function to stop the background task
 def stop_task():
@@ -30,5 +30,5 @@ def homeViewQT():
     root.protocol("WM_DESTROY", stop_task)
     root.mainloop()
 
-# pyinstaller --onefile --hidden-import schedule --hidden-import pyodbc --hidden-import openpyxl --hidden-import pymongo --hidden-import threading --hidden-import pymssql --hidden-import datetime --hidden-import pillow main.py
+# pyinstaller --hidden-import schedule --hidden-import pyodbc --hidden-import openpyxl --hidden-import pymongo --hidden-import threading --hidden-import pymssql --hidden-import datetime --hidden-import pillow main.py
 

@@ -26,21 +26,28 @@ def optimizationQueryData(table):
     result = collection.delete_many({})
     startdate = datetime.datetime(2023, 1, 1, 0, 0, 0)
     query = f"""
-    SELECT CONVERT(date, DateTime) AS date,
-        DAY(DateTime) AS day,
-        MONTH(DateTime) AS month,
-        YEAR(DateTime) AS year,
-        Shift AS shift,
-		FGsCode AS sku,
-		Line As line,
+    SELECT CONVERT(date, Datetime) AS date,
+        DAY(Datetime) AS day,
+        MONTH(Datetime) AS month,
+        YEAR(Datetime) AS year,
+		CASE
+            WHEN DATEPART(hh, DateTime) < 6 THEN 1
+            WHEN DATEPART(hh, DateTime) < 14 THEN 2
+            ELSE 3
+        END AS shift,
+		FgsCode AS sku,
         COUNT(*) AS count,
-        SUM(CASE WHEN Status = 'Good' THEN 1 ELSE 0 END) AS countGood,
-        SUM(CASE WHEN Status = 'Not Good' THEN 1 ELSE 0 END) AS countNotgood
+        SUM(CASE WHEN Barcode = 'Good' THEN 1 ELSE 0 END) AS BarcodeGood,
+        SUM(CASE WHEN DateCode = 'Good' THEN 1 ELSE 0 END) AS DatecodeGood,
+        SUM(CASE WHEN Cap1 = 'Good' THEN 1 ELSE 0 END) AS Cap1Good,
+        SUM(CASE WHEN Cap2 = 'Good' THEN 1 ELSE 0 END) AS Cap2Good,
+        SUM(CASE WHEN Liquid1 = 'Good' THEN 1 ELSE 0 END) AS Liquid1Good,
+        SUM(CASE WHEN Liquid2 = 'Good' THEN 1 ELSE 0 END) AS Liquid2Good
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Weight_Under, Weight_Target, Weight_Over
+    GROUP BY CONVERT(date, Datetime), DAY(Datetime), MONTH(Datetime), YEAR(Datetime), FgsCode,
             CASE
-                WHEN DATEPART(hh, DateTime) < 6 THEN 1
-                WHEN DATEPART(hh, DateTime) < 14 THEN 2
+                WHEN DATEPART(hh, Datetime) < 6 THEN 1
+                WHEN DATEPART(hh, Datetime) < 14 THEN 2
                 ELSE 3
             END
     ORDER BY date, shift;
@@ -56,10 +63,12 @@ def optimizationQueryData(table):
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "line": row[6],
-            "count": row[7],
-            "countPass": row[11],
-            "countNotgood": row[12],
+            "barcodeGood": row[6],
+            "datecodeGood": row[7],
+            "cap1good": row[8],
+            "cap2good": row[9],
+            "liquid1good": row[10],
+            "liquid2good": row[11],
         }
         data_insert.append(new_row)
 
@@ -85,18 +94,16 @@ def optimizationQueryImageFailBarcode(table):
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
             ELSE 3
         END AS shift,
-		FGsCode AS sku,
-		Line As line,
-        Target AS target,
-        COUNT(*) AS count,
-        COUNT(ImageFail) AS countFail
+        FGsCode AS sku,
+		Line AS line,
+        COUNT(*) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Target
-            CASE
-                WHEN DATEPART(hh, DateTime) < 6 THEN 1
-                WHEN DATEPART(hh, DateTime) < 14 THEN 2
-                ELSE 3
-            END
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode, Line,
+        CASE
+            WHEN DATEPART(hh, DateTime) < 6 THEN 1
+            WHEN DATEPART(hh, DateTime) < 14 THEN 2
+            ELSE 3
+        END
     ORDER BY date, shift;
     """
     cursor.execute(pipeline)
@@ -111,8 +118,7 @@ def optimizationQueryImageFailBarcode(table):
             "shift": row[4],
             "sku":  row[5],
             "line": row[6],
-            "target": row[7],
-            "countFail": row[8],
+            "countFail": row[7],
         }
         data_insert.append(new_row)
 
@@ -143,11 +149,10 @@ def optimizationQueryImageFailCap1(table):
             ELSE 3
         END AS shift,
         FGsCode AS sku,
-        COUNT(*) AS count,
-        SUM(CASE WHEN Status = 'Good' THEN 1 ELSE 0 END) AS countPass,
-        SUM(CASE WHEN Status = 'NotGood' THEN 1 ELSE 0 END) AS countReject
-    FROM Table_ResultCounterBottles
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode,
+		Line AS line,
+        COUNT(*) AS countFail
+    FROM {table}
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode, Line,
         CASE
             WHEN DATEPART(hh, DateTime) < 6 THEN 1
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -162,14 +167,13 @@ def optimizationQueryImageFailCap1(table):
     for row in group_data:
         new_row = {
             "date": row[0],
-            "day": row[1],
+            "day": row [1],
             "month": row[2],
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "count": row[6],
-            "countGood": row[7],
-            "countNotGood": row[8],
+            "line": row[6],
+            "countFail": row[7],
         }
         # for key, value in new_row.items():
         # if key == "date":
@@ -205,11 +209,10 @@ def optimizationQueryImageFailCap2(table):
             ELSE 3
         END AS shift,
         FGsCode AS sku,
-        Camera AS camera,
-        COUNT(*) AS count,
-        COUNT(ImageFail) AS countFail
+		Line AS line,
+        COUNT(*) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Camera
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode, Line,
         CASE
             WHEN DATEPART(hh, DateTime) < 6 THEN 1
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -229,9 +232,8 @@ def optimizationQueryImageFailCap2(table):
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "camera": row[6],
-            "count": row[7],
-            "countFail": row[8],
+            "line": row[6],
+            "countFail": row[7],
         }
         #for key, value in new_row.items():
             #if key == "date":
@@ -258,13 +260,16 @@ def optimizationQueryImageFailDateCode(table):
         DAY(DateTime) AS day,
         MONTH(DateTime) AS month,
         YEAR(DateTime) AS year,
-        Shift AS shift,
-		FGsCode AS sku,
-		Line As line,
-        COUNT(*) AS count,
-        COUNT(ImageFail) AS countFail
+        CASE
+            WHEN DATEPART(hh, DateTime) < 6 THEN 1
+            WHEN DATEPART(hh, DateTime) < 14 THEN 2
+            ELSE 3
+        END AS shift,
+        FGsCode AS sku,
+		Line AS line,
+        COUNT(*) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode, Line,
         CASE
             WHEN DATEPART(hh, DateTime) < 6 THEN 1
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -278,19 +283,15 @@ def optimizationQueryImageFailDateCode(table):
     for row in data:
         new_row = {
             "date": row[0],
-            "day": row[1],
+            "day": row [1],
             "month": row[2],
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "name": row[6],
-            "line": row[7],
-            "count": row[8],
-            "countGood": row[9],
-            "countNotgood": row[10],
+            "line": row[6],
+            "countFail": row[7],
         }
         data_insert.append(new_row)
-    print(data_insert)
 
     collection.insert_many(data_insert)
     connection.close()
@@ -319,11 +320,10 @@ def optimizationQueryImageFailLO1(table):
             ELSE 3
         END AS shift,
         FGsCode AS sku,
-        Camera AS camera,
-        COUNT(*) AS count,
-        COUNT(ImageFail) AS countFail
+		Line AS line,
+        COUNT(*) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Camera
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode, Line,
         CASE
             WHEN DATEPART(hh, DateTime) < 6 THEN 1
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -343,9 +343,8 @@ def optimizationQueryImageFailLO1(table):
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "camera": row[6],
-            "count": row[7],
-            "countFail": row[8],
+            "line": row[6],
+            "countFail": row[7],
         }
         #for key, value in new_row.items():
             #if key == "date":
@@ -381,11 +380,10 @@ def optimizationQueryImageFailLO2(table):
             ELSE 3
         END AS shift,
         FGsCode AS sku,
-        Camera AS camera,
-        COUNT(*) AS count,
-        COUNT(ImageFail) AS countFail
+		Line AS line,
+        COUNT(*) AS countFail
     FROM {table}
-    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), Line, FGsCode, Camera
+    GROUP BY CONVERT(date, DateTime), DAY(DateTime), MONTH(DateTime), YEAR(DateTime), FGsCode, Line,
         CASE
             WHEN DATEPART(hh, DateTime) < 6 THEN 1
             WHEN DATEPART(hh, DateTime) < 14 THEN 2
@@ -405,9 +403,8 @@ def optimizationQueryImageFailLO2(table):
             "year": row[3],
             "shift": row[4],
             "sku":  row[5],
-            "camera": row[6],
-            "count": row[7],
-            "countFail": row[8],
+            "line": row[6],
+            "countFail": row[7],
         }
         #for key, value in new_row.items():
             #if key == "date":
@@ -420,10 +417,10 @@ def optimizationQueryImageFailLO2(table):
     connection.close()
 
 def querySqlServer():
-    # optimizationQueryData("Table_Data") ## done
+    optimizationQueryData("Table_Data") ## done
     optimizationQueryImageFailBarcode("Table_ImageFail_Barcode") ## done
-    optimizationQueryImageFailCap1("Table_ImageFail_Cap1")
-    optimizationQueryImageFailCap2("Table_ImageFail_Cap2")
+    optimizationQueryImageFailCap1("Table_ImageFail_Cap1")## done
+    optimizationQueryImageFailCap2("Table_ImageFail_Cap2")## done
     optimizationQueryImageFailDateCode("Table_ImageFail_DateCode")
     optimizationQueryImageFailLO1("Table_ImageFail_LO1") 
     optimizationQueryImageFailLO2("Table_ImageFail_LO2")

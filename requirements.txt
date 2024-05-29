@@ -1,7 +1,8 @@
-pymssql
-pandas
-numpy
+schedule  
 pyodbc
 openpyxl
 pymongo
-schedule
+pymssql 
+datetime
+pillow
+pyinstaller
